@@ -7,6 +7,7 @@ dotenv.config();
 const app = express();
 
 const PORT = process.env.PORT || 4500;
+export const GOOGLE_MAPS_API = process.env.GOOGLE_MAPS_API;
 
 app.use(express.json());
 app.use(cors());
