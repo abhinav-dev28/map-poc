@@ -3,6 +3,8 @@ import {
   getAddressCoordinates,
   getAutoCompleteSuggestions,
   getPhysicalActivityPlaces,
+  getPlaceDetails,
+  getPlacePhoto,
 } from "../services/mapServices";
 
 export const getCoordinates = async (
@@ -10,8 +12,7 @@ export const getCoordinates = async (
   res: Response,
   next: NextFunction
 ) => {
-  //   const { address } = req.query;
-  const address = "Lucknow";
+  const address = req.query.address as string;
 
   try {
     const coordinates = await getAddressCoordinates(address);
@@ -88,8 +89,35 @@ export const getPlaces = async (req: Request, res: Response) => {
       res.status(404).json({ message: "No places found" });
     }
     res.status(200).json(places);
-  } catch (error) {
-    console.error("Error fetching places:", error);
+  } catch (error: any) {
+    console.error("Error fetching places:", error.message);
     res.status(500).json({ error: "Internal server error" });
+  }
+};
+export const getPlaceDetailsById = async (req: Request, res: Response) => {
+  const placeId: string = req.query.placeId as string;
+  if (!placeId) {
+    res.status(400).json({ error: "Place ID is required" });
+  }
+
+  try {
+    const placeDetails = await getPlaceDetails(placeId);
+    res.status(200).json(placeDetails);
+  } catch (error) {
+    res.status(404).json({ message: "Place details not found" });
+  }
+};
+
+export const getPlacePhotoById = async (req: Request, res: Response) => {
+  const placeId: string = req.query.placeId as string;
+  if (!placeId) {
+    res.status(400).json({ error: "Photo reference is required" });
+  }
+
+  try {
+    const placephoto = await getPlacePhoto(placeId);
+    res.status(200).json(placephoto);
+  } catch (error) {
+    res.status(404).json({ message: "Place Photo not found" });
   }
 };

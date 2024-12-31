@@ -1,26 +1,23 @@
-import React from "react";
 import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
 
 const GymCard = ({ gym }) => {
-  const handleBook = () => {
-    console.log(gym.placeId);
-  };
+  const defaultImage =
+    "https://static.vecteezy.com/system/resources/thumbnails/046/836/920/small/bangladeshi-male-fitness-trainer-in-modern-gym-setting-promoting-health-and-exercise-photo.jpg";
   return (
     <div className="relative bg-slate-800 rounded-lg overflow-hidden shadow-md text-white">
       <img
-        src={gym.image}
+        src={gym.image !== "No image available" ? gym.image : defaultImage}
         alt={gym.name}
         className="w-full h-48 object-cover"
       />
-      <button className="absolute top-4 right-4 p-2 rounded-full bg-white/80 hover:bg-white">
-        {/* <Heart className="w-5 h-5 text-gray-600" /> */}
-      </button>
+
+      <button className="absolute top-4 right-4 p-2 rounded-full bg-white/80 hover:bg-white"></button>
       <div className="p-4">
         <div className="flex justify-between items-start">
           <div>
             <h3 className="text-lg font-semibold">{gym.name}</h3>
             <div className="flex items-center space-x-1 text-sm text-white">
-              {/* <MapPin className="w-4 h-4" /> */}
               <span>{gym.address}</span>
             </div>
           </div>
@@ -34,8 +31,8 @@ const GymCard = ({ gym }) => {
           <div className="text-sm">Opens at {gym?.isOpen}</div>
           <Link
             to={`/gym/${gym.placeId}`}
+            state={gym}
             className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-            onClick={handleBook}
           >
             Book Now
           </Link>
@@ -43,6 +40,17 @@ const GymCard = ({ gym }) => {
       </div>
     </div>
   );
+};
+GymCard.propTypes = {
+  gym: PropTypes.shape({
+    placeId: PropTypes.string.isRequired,
+    image: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    address: PropTypes.string.isRequired,
+    rating: PropTypes.string | PropTypes.number,
+    reviewCount: PropTypes.number,
+    isOpen: PropTypes.string,
+  }).isRequired,
 };
 
 export default GymCard;

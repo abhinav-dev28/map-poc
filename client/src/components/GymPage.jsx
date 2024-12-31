@@ -1,25 +1,53 @@
-import React from "react";
 import MapCard from "./MapCard";
 import GetDirections from "./GetDirection";
+import { useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { GET_PLACE_DETAIL } from "../utils/API";
 
 const GymPage = () => {
-  const userLocation = { lat: 26.8467, lng: 80.9462 }; // Example: Lucknow coordinates
-  const gymLocation = { lat: 25.6541, lng: 83.5576 }; // Example: Gym coordinates
+  const location = useLocation();
+  const data = location.state;
+  const [gymData, setGymData] = useState(null);
+  const [isLoading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchDetail = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(GET_PLACE_DETAIL, {
+          params: { placeId: data.placeId },
+        });
+        setGymData(response.data);
+      } catch (error) {
+        console.log(error.message);
+        alert(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDetail();
+  }, [data.placeId]);
+
+  const userLocation = { lat: 26.8467, lng: 80.9462 };
+  // const gymLocation = { lat: 28.5035123302915, lng: 77.39148138029151 };
+
+  if (isLoading) return <div>Loading...</div>;
   return (
     <div className="bg-gray-900 text-white min-h-screen">
       <main className="p-6 space-y-10">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-4xl font-bold">Gym Name</h1>
+            <h1 className="text-4xl font-bold">{gymData?.name}</h1>
             <div className="flex items-center gap-4 mt-2">
-              <span className="text-yellow-500 text-lg">5.0</span>
-              <span>(378)</span>
+              <span className="text-yellow-500 text-lg">{gymData?.rating}</span>
+              <span>{gymData?.reviews.length}</span>
               <span className="text-sm text-gray-400">Open until 10:00 PM</span>
               <span>•</span>
-              <span className="text-gray-400">Business Bay, Dubai</span>
+              <span className="text-gray-400">{gymData?.address}</span>
               <GetDirections
                 userLocation={userLocation}
-                gymLocation={gymLocation}
+                gymLocation={gymData?.geometry}
               />
             </div>
           </div>
@@ -29,14 +57,13 @@ const GymPage = () => {
           </div>
         </div>
 
-        {/* Image Gallery */}
         <div className="grid grid-cols-3 border gap-4">
           <img
-            src="https://via.placeholder.com/500"
+            src={gymData?.image}
             alt="Main"
             className="col-span-2 rounded-lg"
           />
-          <div className="flex flex-col gap-4">
+          {/* <div className="flex flex-col gap-4">
             <img
               src="https://via.placeholder.com/150"
               alt="1"
@@ -57,12 +84,10 @@ const GymPage = () => {
                 16 Images
               </span>
             </div>
-          </div>
+          </div> */}
         </div>
 
-        {/* Content Section */}
         <div className="grid grid-cols-3 gap-6">
-          {/* About Section */}
           <div className="col-span-2 space-y-4">
             <div>
               <h2 className="text-2xl font-bold">About</h2>
@@ -75,10 +100,7 @@ const GymPage = () => {
             </div>
             {/* Map */}
             <div className="rounded-lg overflow-hidden">
-              <MapCard
-                latitude={26.678564919338367}
-                longitude={80.98047818562385}
-              />
+              <MapCard latitude={28.5803356} longitude={77.3313948} />
             </div>
             {/* Services */}
             <div className="flex gap-4">

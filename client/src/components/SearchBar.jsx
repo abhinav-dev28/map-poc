@@ -1,15 +1,16 @@
-import React, { useState } from "react";
+import { useContext, useState } from "react";
 import axios from "axios";
-import { GET_SUGGESTION } from "../utils/API";
-import { fetchData } from "../utils/fetchData";
+import { GET_PLACES, GET_SUGGESTION } from "../utils/API";
+import { AppContext } from "../context/AppContext";
 
 const SearchBar = () => {
   const [location, setLocation] = useState(null);
   const [input, setInput] = useState("");
   const [suggestions, setSuggestions] = useState([]);
-  // const [coordinates, setCoordinates] = useState(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const { fetchData, state } = useContext(AppContext);
+  const [radius, setRadius] = useState(15000);
+
   const onChangeHandler = async (e) => {
     setInput(e.target.value);
     if (e.target.value === "") {
@@ -28,12 +29,8 @@ const SearchBar = () => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const coordinates = position.coords;
-          // const latitude = position.coords.latitude;
-          // const longitude = position.coords.longitude;
           setInput("Current Location");
-          // setCoordinates(coordinates);
           setLocation(coordinates);
-          console.log("Current Location:", coordinates);
         },
         (error) => {
           console.error("Error getting location:", error);
@@ -46,28 +43,31 @@ const SearchBar = () => {
   };
 
   const handleSearch = async () => {
+    if (!location) {
+      alert("Please enter a location");
+      return;
+    }
     try {
-      const data = await fetchData(GET_PLACES, {
-        latitude: location.latitude,
-        longitude: location.longitude,
-        radius: 5000,
+      fetchData(GET_PLACES, {
+        latitude: location?.latitude,
+        longitude: location?.longitude,
+        radius: radius,
         keyword: "gym",
+        address: location?.description,
       });
-      setGyms(data);
     } catch (error) {
       console.error("Error fetching gyms:", error);
     }
   };
   return (
-    <div className="flex space-x-2 max-w-2xl mx-auto mt-8">
+    <div className="flex space-x-2 max-w-4xl mx-auto mt-8">
       <div className="flex-1 flex items-center space-x-2 bg-gray-800 rounded-lg px-4 py-2">
-        {/* <MapPin className="text-gray-400 w-5 h-5" /> */}
         <input
           type="text"
           name="location"
           value={input}
           onChange={onChangeHandler}
-          placeholder="Current Location"
+          placeholder="Enter Location"
           className="bg-transparent text-white w-full focus:outline-none"
         />
         <button
@@ -90,7 +90,6 @@ const SearchBar = () => {
                   setLocation(suggestion);
                   setInput(suggestion.description);
                   setShowSuggestions(false);
-                  // console.log(location, suggestion);
                 }}
               >
                 {suggestion.description}
@@ -100,7 +99,6 @@ const SearchBar = () => {
         )}
       </div>
       <div className="flex items-center space-x-2 bg-gray-800 rounded-lg px-4 py-2">
-        {/* <Calendar className="text-gray-400 w-5 h-5" /> */}
         <input
           type="text"
           placeholder="Any Date"
@@ -108,14 +106,24 @@ const SearchBar = () => {
         />
       </div>
       <div className="flex items-center space-x-2 bg-gray-800 rounded-lg px-4 py-2">
-        {/* <Clock className="text-gray-400 w-5 h-5" /> */}
         <input
           type="text"
           placeholder="Any Time"
           className="bg-transparent text-white w-32 focus:outline-none"
         />
       </div>
+      <div className="flex items-center space-x-2 bg-gray-800 text-white rounded-lg px-4 py-2">
+        <label>5km Distance</label>
+        <input
+          type="checkbox"
+          name="radius"
+          id="radius"
+          onChange={() => setRadius(5000)}
+        />
+      </div>
+
       <button
+        disabled={!location || state.loading}
         className="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600"
         onClick={handleSearch}
       >
