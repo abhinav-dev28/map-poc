@@ -118,7 +118,10 @@ const SearchBar = () => {
           type="checkbox"
           name="radius"
           id="radius"
-          onChange={() => setRadius(5000)}
+          className="w-5 h-5"
+          onChange={(e) => {
+            e.target.checked ? setRadius(5000) : setRadius(15000);
+          }}
         />
       </div>
 
