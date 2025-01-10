@@ -57,7 +57,6 @@ export const getPlaces = async (req: Request, res: Response) => {
   try {
     let lat, lng;
 
-    // If address is provided, derive coordinates
     if (address) {
       const coordinates = await getAddressCoordinates(address);
       if (!coordinates) {
@@ -69,7 +68,6 @@ export const getPlaces = async (req: Request, res: Response) => {
       lat = latitude!;
       lng = longitude!;
     }
-
     // Check if either lat/lng or address-derived coordinates exist
     if (!lat || !lng) {
       res.status(400).json({
@@ -95,7 +93,8 @@ export const getPlaces = async (req: Request, res: Response) => {
   }
 };
 export const getPlaceDetailsById = async (req: Request, res: Response) => {
-  const placeId: string = req.query.placeId as string;
+  const placeId: string = req.params.placeId as string;
+
   if (!placeId) {
     res.status(400).json({ error: "Place ID is required" });
   }

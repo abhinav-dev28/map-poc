@@ -12,12 +12,11 @@ const GymPage = () => {
   const [isLoading, setLoading] = useState(false);
 
   useEffect(() => {
+    console.log(data?.placeId);
     const fetchDetail = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(GET_PLACE_DETAIL, {
-          params: { placeId: data.placeId },
-        });
+        const response = await axios.get(`${GET_PLACE_DETAIL}/${data.placeId}`);
         setGymData(response.data);
       } catch (error) {
         console.log(error.message);
@@ -100,7 +99,7 @@ const GymPage = () => {
             </div>
             {/* Map */}
             <div className="rounded-lg overflow-hidden">
-              <MapCard latitude={28.5803356} longitude={77.3313948} />
+              <MapCard position={gymData?.geometry} />
             </div>
             {/* Services */}
             <div className="flex gap-4">

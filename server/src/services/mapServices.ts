@@ -64,7 +64,6 @@ export const getPhysicalActivityPlaces = async (
 ) => {
   const apiKey = process.env.GOOGLE_MAPS_API;
 
-  //   Fetching Places based on coordinates
   const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&keyword=${encodeURIComponent(
     keyword
   )}&key=${apiKey}`;
@@ -88,9 +87,11 @@ export const getPhysicalActivityPlaces = async (
               ? "Open now"
               : "Closed now"
             : "Opening hours not available",
+        time: place.opening_hours || "Opening hours not available",
       }));
 
       return places.length > 0 ? places : [];
+      // return response.data.results;
     } else if (response.data.status === "ZERO_RESULTS") {
       return [];
     } else {
@@ -105,7 +106,7 @@ export const getPhysicalActivityPlaces = async (
 export const getPlaceDetails = async (placeId: string) => {
   const apiKey = process.env.GOOGLE_MAPS_API;
 
-  const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=name,formatted_address,formatted_phone_number,website,rating,review,opening_hours,photo,geometry&key=${apiKey}`;
+  const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=id,name,types,formatted_address,photos,formatted_phone_number,opening_hours,rating,user_ratings_total,geometry,reviews&key=${apiKey}`;
 
   try {
     const response = await axios.get(url);
@@ -116,10 +117,11 @@ export const getPlaceDetails = async (placeId: string) => {
         address: place.formatted_address,
         geometry: place.geometry.location,
         phone: place.formatted_phone_number || "Phone number not available",
-        website: place.website || "Website not available",
         rating: place.rating || "Rating not available",
-        reviews: place.reviews || [],
-        openingHours: place.opening_hours || "Opening hours not available",
+        reviews: place.reviews.length || 0,
+        isOpenNow: place.opening_hours.open_now ? true : false,
+        openingHours:
+          place.opening_hours.weekday_text || "Opening hours not available",
         photo_reference: place.photos ? place.photos[0].photo_reference : "",
         image: place.photos
           ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place.photos[0].photo_reference}&key=${apiKey}`

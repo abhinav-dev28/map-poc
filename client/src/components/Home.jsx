@@ -12,9 +12,11 @@ const Home = () => {
       latitude: 28.5355,
       longitude: 77.391,
       radius: 10000,
-      keyword: "gym",
+      keyword: "gym,yoga",
     });
   }, []);
+  console.log(state);
+
   return (
     <div className="min-h-screen bg-gray-900">
       <main className="container mx-auto px-6 py-8">
