@@ -17,7 +17,7 @@ const GymPage = () => {
       setLoading(true);
       try {
         const response = await axios.get(`${GET_PLACE_DETAIL}/${data.placeId}`);
-        setGymData(response.data);
+        setGymData(response.data.data);
       } catch (error) {
         console.log(error.message);
         alert(error.message);
@@ -40,7 +40,7 @@ const GymPage = () => {
             <h1 className="text-4xl font-bold">{gymData?.name}</h1>
             <div className="flex items-center gap-4 mt-2">
               <span className="text-yellow-500 text-lg">{gymData?.rating}</span>
-              <span>{gymData?.reviews.length}</span>
+              <span>{gymData?.reviews}</span>
               <span className="text-sm text-gray-400">Open until 10:00 PM</span>
               <span>•</span>
               <span className="text-gray-400">{gymData?.address}</span>
